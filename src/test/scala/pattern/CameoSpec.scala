@@ -4,19 +4,19 @@ import akka.actor.{ActorSystem, Props}
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
 import common._
 import org.scalatest.{Matchers, WordSpecLike}
-import pattern.AccountBalanceRetrieverFinal.AccountRetrievalTimeout
+import pattern.AccountBalanceResponseHandler._
 
 import scala.concurrent.duration._
 
-class ExtraFinalSpec extends TestKit(ActorSystem("ExtraTestAS")) with ImplicitSender with WordSpecLike with Matchers {
+class CameoSpec extends TestKit(ActorSystem("CameoTestAS")) with ImplicitSender with WordSpecLike with Matchers {
   "An AccountBalanceRetriever" should {
     "return a list of account balances" in {
       val probe1 = TestProbe()
       val probe2 = TestProbe()
-      val savingsAccountsProxy = system.actorOf(Props[SavingsAccountsProxyStub], "extra-success-savings")
-      val checkingAccountsProxy = system.actorOf(Props[CheckingAccountsProxyStub], "extra-success-checkings")
-      val moneyMarketAccountsProxy = system.actorOf(Props[MoneyMarketAccountsProxyStub], "extra-success-money-markets")
-      val accountBalanceRetriever = system.actorOf(Props(new AccountBalanceRetrieverFinal(savingsAccountsProxy, checkingAccountsProxy, moneyMarketAccountsProxy)), "extra-retriever")
+      val savingsAccountsProxy = system.actorOf(Props[SavingsAccountsProxyStub], "cameo-success-savings")
+      val checkingAccountsProxy = system.actorOf(Props[CheckingAccountsProxyStub], "cameo-success-checkings")
+      val moneyMarketAccountsProxy = system.actorOf(Props[MoneyMarketAccountsProxyStub], "cameo-success-money-markets")
+      val accountBalanceRetriever = system.actorOf(Props(new AccountBalanceRetriever(savingsAccountsProxy, checkingAccountsProxy, moneyMarketAccountsProxy)), "cameo-retriever1")
 
       within(300 milliseconds) {
         probe1.send(accountBalanceRetriever, GetCustomerAccountBalances(1L))
@@ -31,10 +31,10 @@ class ExtraFinalSpec extends TestKit(ActorSystem("ExtraTestAS")) with ImplicitSe
     }
 
     "return a TimeoutException when timeout is exceeded" in {
-      val savingsAccountsProxy = system.actorOf(Props[TimingOutSavingsAccountProxyStub], "extra-timing-out-savings")
-      val checkingAccountsProxy = system.actorOf(Props[CheckingAccountsProxyStub], "extra-timing-out-checkings")
-      val moneyMarketAccountsProxy = system.actorOf(Props[MoneyMarketAccountsProxyStub], "extra-timing-out-money-markets")
-      val accountBalanceRetriever = system.actorOf(Props(new AccountBalanceRetrieverFinal(savingsAccountsProxy, checkingAccountsProxy, moneyMarketAccountsProxy)), "extra-timing-out-retriever")
+      val savingsAccountsProxy = system.actorOf(Props[TimingOutSavingsAccountProxyStub], "cameo-timing-out-savings")
+      val checkingAccountsProxy = system.actorOf(Props[CheckingAccountsProxyStub], "cameo-timing-out-checkings")
+      val moneyMarketAccountsProxy = system.actorOf(Props[MoneyMarketAccountsProxyStub], "cameo-timing-out-money-markets")
+      val accountBalanceRetriever = system.actorOf(Props(new AccountBalanceRetriever(savingsAccountsProxy, checkingAccountsProxy, moneyMarketAccountsProxy)), "cameo-timing-out-retriever")
       val probe = TestProbe()
 
       within(250 milliseconds, 500 milliseconds) {
