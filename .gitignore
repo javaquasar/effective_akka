@@ -1,0 +1,15 @@
+outline.asc
+effective_akka.log
+/bin/
+.DS_Store
+.cache
+.classpath
+.history
+.project
+.settings/
+binold/
+project/project/
+project/target/
+target/
+
+.idea
